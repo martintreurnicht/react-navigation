@@ -181,6 +181,7 @@ function CardContainerInner({
     gestureVelocityImpact,
     headerMode,
     headerShown,
+    headerTransparent,
     transitionSpec,
   } = scene.descriptor.options;
 
@@ -281,7 +282,18 @@ function CardContainerInner({
                 getFocusedRoute,
                 contentHeight: headerHeight,
                 onContentHeightChange: onHeaderHeightChange,
-                style: styles.header,
+                style: [
+                  styles.header,
+                  headerTransparent
+                    ? [
+                        // A transparent header is absolutely positioned, so without an explicit
+                        // height its container collapses to zero and iOS accessibility tools
+                        // (VoiceOver, XCUITest) can't reach its children. Mirrors the float header.
+                        { height: headerHeight?.value },
+                        styles.absolute,
+                      ]
+                    : null,
+                ],
               })
             : null}
           <View style={styles.scene}>
@@ -315,6 +327,12 @@ const styles = StyleSheet.create({
   },
   header: {
     zIndex: 1,
+  },
+  absolute: {
+    position: 'absolute',
+    top: 0,
+    start: 0,
+    end: 0,
   },
   scene: {
     flex: 1,
